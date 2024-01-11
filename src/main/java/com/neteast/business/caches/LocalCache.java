@@ -13,6 +13,7 @@ public class LocalCache {
 
     public final static String USER_INFO = "user_info:";
 
+
     private static Cache<String, Object> caffeineCache = SpringUtil.getBean(Cache.class);
 
     public static void putCache(String key, Object value){
