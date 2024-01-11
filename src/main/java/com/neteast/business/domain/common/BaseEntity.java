@@ -2,6 +2,7 @@ package com.neteast.business.domain.common;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.neteast.business.domain.LoginUser;
 import lombok.Data;
 
 import java.util.Date;
@@ -33,5 +34,15 @@ public class BaseEntity {
 
     @TableField("update_phone")
     private String updatePhone;
+
+    public void setCreateMsg(LoginUser loginUser){
+        this.createBy = loginUser.getUsername();
+        this.createPhone = loginUser.getTel();
+    }
+
+    public void setUpdateMsg(LoginUser loginUser){
+        this.updateBy = loginUser.getUsername();
+        this.updatePhone = loginUser.getTel();
+    }
 
 }

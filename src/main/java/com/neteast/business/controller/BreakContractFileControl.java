@@ -36,12 +36,6 @@ import java.util.regex.Pattern;
 @RequestMapping("/breakContract")
 public class BreakContractFileControl extends BaseController{
 
-    private String HEADER = "userMsg";
-
-    private static final int NO_AUTHORIZATION = 401;
-
-    private static final String NO_AUTHORIZATION_MSG = "身份鉴权失败，请重新登录！";
-
     private IBreakContractFileService breakContractFileService;
 
     @Autowired
@@ -51,9 +45,6 @@ public class BreakContractFileControl extends BaseController{
 
     @Value("${contract.file.path}")
     public String filePath;
-
-    @Value("${contract.time}")
-    public Integer outTime;
 
     @GetMapping("/listByPage")
     public AjaxResult getList(BreakContractFile breakContractFile){
@@ -86,6 +77,8 @@ public class BreakContractFileControl extends BaseController{
     public AjaxResult updateBreakContractFile(@RequestBody BreakContractFile file,@RequestAttribute(value = "userMsg",required = false)String userMsg){
 
         logger.info("用户信息-{}",userMsg);
+        LoginUser user = JSON.parseObject(userMsg,LoginUser.class);
+        file.setUpdateMsg(user);
         breakContractFileService.updateById(file);
         return success();
     }
@@ -100,6 +93,7 @@ public class BreakContractFileControl extends BaseController{
                                               @RequestHeader(value = "userMsg",required = false)String userMsg) throws IOException {
 
         logger.info("用户信息-{}",userMsg);
+        LoginUser user = JSON.parseObject(userMsg,LoginUser.class);
         //无目录进行创建
         boolean res = true;
         File dir = new File(filePath);
@@ -125,6 +119,7 @@ public class BreakContractFileControl extends BaseController{
                 contractFile.setDocumentNumber(documentNumber);
                 contractFile.setUnit(unit);
                 contractFile.setHandleTime(handleTime);
+                contractFile.setCreateMsg(user);
                 breakContractFileService.save(contractFile);
                 //文件保存
                 Path path = Paths.get(filePath+File.separator+fileName);

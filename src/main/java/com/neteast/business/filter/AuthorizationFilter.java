@@ -8,6 +8,7 @@ import com.neteast.business.domain.common.BaseResult;
 import com.neteast.business.exception.BaseBusException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Request;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -39,6 +40,9 @@ public class AuthorizationFilter implements Filter{
     private static final String T = "t";
 
     private static final String SIGN = "sign";
+
+    @Value("${contract.time}")
+    public Integer outTime;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -110,7 +114,7 @@ public class AuthorizationFilter implements Filter{
         if (!loginUser.valid()){
             return null;
         }
-        Date end = DateUtil.offsetMinute(start,120);
+        Date end = DateUtil.offsetMinute(start,outTime);
         Date now = new Date();
         if (DateUtil.compare(end,now)<0){
             return null;
