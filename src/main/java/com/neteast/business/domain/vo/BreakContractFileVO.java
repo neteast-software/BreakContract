@@ -1,9 +1,7 @@
 package com.neteast.business.domain.vo;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.neteast.business.domain.BreakContractFile;
 import com.neteast.business.domain.enums.ContractType;
 import lombok.Data;
@@ -20,6 +18,9 @@ public class BreakContractFileVO {
 
     /** 主键id */
     private Integer id;
+
+    /** 计量期数 */
+    private String measure;
 
     private Integer contractType;
 
@@ -51,6 +52,7 @@ public class BreakContractFileVO {
     private String unit;
 
     /** 处理时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date handleTime;
 
     public static BreakContractFileVO convert(BreakContractFile file){

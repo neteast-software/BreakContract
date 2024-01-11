@@ -1,6 +1,7 @@
 package com.neteast.business.controller;
 
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson2.JSON;
 import com.github.pagehelper.PageInfo;
 import com.neteast.business.domain.BreakContractFile;
 import com.neteast.business.domain.LoginUser;
@@ -55,9 +56,8 @@ public class BreakContractFileControl extends BaseController{
     public Integer outTime;
 
     @GetMapping("/listByPage")
-    public AjaxResult getList(BreakContractFile breakContractFile,@RequestAttribute(value = "userMsg",required = false)String userMsg){
+    public AjaxResult getList(BreakContractFile breakContractFile){
 
-        logger.info("用户信息-{}",userMsg);
         startPage();
         List<BreakContractFileVO> voList = new ArrayList<>();
         List<BreakContractFile> fileList = breakContractFileService.getBreakContractFileList(breakContractFile);
@@ -73,9 +73,8 @@ public class BreakContractFileControl extends BaseController{
     }
 
     @PostMapping("/del/{id}")
-    public AjaxResult delBreakContractFile(@PathVariable("id") Integer id,@RequestAttribute(value = "userMsg",required = false)String userMsg){
+    public AjaxResult delBreakContractFile(@PathVariable("id") Integer id){
 
-        logger.info("用户信息-{}",userMsg);
         boolean res = breakContractFileService.removeBreakContract(id);
         if (!res){
             return error("文件删除失败");
@@ -92,11 +91,12 @@ public class BreakContractFileControl extends BaseController{
     }
 
     @PostMapping("/upload")
-    public AjaxResult uploadBreakContractFile(@RequestParam("file")MultipartFile file,
+    public AjaxResult uploadBreakContractFile(@RequestParam(value = "file",required = false)MultipartFile file,
                                               @RequestParam("contractType")Integer contractType,
                                               @RequestParam("documentNumber")String documentNumber,
                                               @RequestParam("unit")String unit,
                                               @RequestParam("handleTime")Date handleTime,
+                                              @RequestParam("measure")String measure,
                                               @RequestHeader(value = "userMsg",required = false)String userMsg) throws IOException {
 
         logger.info("用户信息-{}",userMsg);
@@ -106,16 +106,22 @@ public class BreakContractFileControl extends BaseController{
         if (!dir.exists()){
             res = dir.mkdir();
         }
+        Long count = breakContractFileService.lambdaQuery().eq(BreakContractFile::getDocumentNumber,documentNumber).count();
+        if (count!=0){
+            return error("该文号已存在");
+        }
         //文件保存
         if (res){
             String originName = file.getOriginalFilename();
             if (originName!=null){
+                String title = originName.replaceFirst("\\.\\w+$", "");
                 String fileName = StringUtils.cleanPath(file.getOriginalFilename());
                 //保存文件信息
                 BreakContractFile contractFile = getBreakContractFile(originName);
                 contractFile.setFileAddress(filePath+File.separator+fileName);
                 contractFile.setContractType(contractType);
-                contractFile.setTitle(fileName);
+                contractFile.setTitle(title);
+                contractFile.setMeasure(measure);
                 contractFile.setDocumentNumber(documentNumber);
                 contractFile.setUnit(unit);
                 contractFile.setHandleTime(handleTime);

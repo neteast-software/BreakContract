@@ -1,6 +1,7 @@
 package com.neteast.business.domain;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 
@@ -10,6 +11,7 @@ import java.util.Date;
  */
 
 @Data
+@ToString
 public class LoginUser {
 
     /** 用户名 */

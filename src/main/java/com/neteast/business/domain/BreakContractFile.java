@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.neteast.business.domain.common.BaseEntity;
 import lombok.Data;
 
@@ -69,5 +70,6 @@ public class BreakContractFile extends BaseEntity {
 
     /** 处理时间 */
     @TableField("handle_time")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date handleTime;
 }
