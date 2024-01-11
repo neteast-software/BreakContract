@@ -1,0 +1,35 @@
+server:
+  port: 9999
+
+# 项目信息配置
+contract:
+  #操作时间(分钟)
+  time: 120
+  file:
+    path: C:\Users\linfu\Desktop\testFile
+
+#数据库配置信息
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    druid:
+      url: jdbc:mysql://192.168.3.105:3306/break-contract?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      username: lfc
+      password: linfunlinfun
+  servlet:
+    multipart:
+      max-file-size: 10MB  # 设置最大上传文件大小
+      max-request-size: 10MB  # 设置最大请求大小
+
+# mybatis配置
+mybatis-plus:
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
+  typeAliasesPackage: com.neteast.**.domain
+
+# PageHelper分页插件
+pagehelper:
+  helperDialect: sqlite
+  supportMethodsArguments: true
+  params: count=countSql

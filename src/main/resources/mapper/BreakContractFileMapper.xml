@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neteast.business.mapper.BreakContractFileMapper">
+
+    <select id="getList" resultType="com.neteast.business.domain.BreakContractFile" parameterType="com.neteast.business.domain.BreakContractFile">
+        select
+        id,contract_type,document_number,title,reward,epc_one,epc_two,j_one,j_two,unit,handle_time,create_time,create_by,update_time,update_by,phone
+        from break_contract_file
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="documentNumber != null and documentNumber != ''">
+                and document_number = #{documentNumber}
+            </if>
+            <if test="title != null and title != ''">
+                and title = #{title}
+            </if>
+            <if test="unit != null and unit != ''">
+                and unit = #{unit}
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone = #{phone}
+            </if>
+        </where>
+    </select>
+</mapper>
