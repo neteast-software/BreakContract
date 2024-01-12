@@ -1,14 +1,12 @@
 package com.neteast.business.controller;
 
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.neteast.business.domain.BreakContractFile;
 import com.neteast.business.domain.LoginUser;
 import com.neteast.business.domain.common.AjaxResult;
 import com.neteast.business.domain.vo.BreakContractFileVO;
-import com.neteast.business.exception.BaseBusException;
-import com.neteast.business.filter.AuthorizationFilter;
 import com.neteast.business.service.IBreakContractFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,7 +76,10 @@ public class BreakContractFileControl extends BaseController{
 
         logger.info("用户信息-{}",userMsg);
         LoginUser user = JSON.parseObject(userMsg,LoginUser.class);
-        file.setUpdateMsg(user);
+        file.setUpdateTime(new Date());
+        if (user!=null){
+            file.setUpdateMsg(user);
+        }
         breakContractFileService.updateById(file);
         return success();
     }
@@ -90,8 +91,17 @@ public class BreakContractFileControl extends BaseController{
                                               @RequestParam("unit")String unit,
                                               @RequestParam("handleTime")Date handleTime,
                                               @RequestParam("measure")String measure,
-                                              @RequestHeader(value = "userMsg",required = false)String userMsg) throws IOException {
+                                              @RequestParam(value = "epcOne",required = false)Double EPCOne,
+                                              @RequestParam(value = "epcTwo",required = false)Double EPCTwo,
+                                              @RequestParam(value = "jone",required = false)Double JOne,
+                                              @RequestParam(value = "jtwo",required = false)Double JTwo,
+                                              @RequestParam(value = "reward",required = false)Double reward,
+                                              @RequestAttribute(value = "userMsg",required = false)String userMsg) throws IOException {
 
+        if (file==null){
+            logger.info("文件未上传-{}",documentNumber);
+            return error("文件未上传");
+        }
         logger.info("用户信息-{}",userMsg);
         LoginUser user = JSON.parseObject(userMsg,LoginUser.class);
         //无目录进行创建
@@ -111,7 +121,7 @@ public class BreakContractFileControl extends BaseController{
                 String title = originName.replaceFirst("\\.\\w+$", "");
                 String fileName = StringUtils.cleanPath(file.getOriginalFilename());
                 //保存文件信息
-                BreakContractFile contractFile = getBreakContractFile(originName);
+                BreakContractFile contractFile = new BreakContractFile();
                 contractFile.setFileAddress(filePath+File.separator+fileName);
                 contractFile.setContractType(contractType);
                 contractFile.setTitle(title);
@@ -119,7 +129,15 @@ public class BreakContractFileControl extends BaseController{
                 contractFile.setDocumentNumber(documentNumber);
                 contractFile.setUnit(unit);
                 contractFile.setHandleTime(handleTime);
-                contractFile.setCreateMsg(user);
+                contractFile.setJTwo(JTwo);
+                contractFile.setJOne(JOne);
+                contractFile.setEpcTwo(EPCTwo);
+                contractFile.setEpcOne(EPCOne);
+                contractFile.setReward(reward);
+                contractFile.setCreateTime(new Date());
+                if (user!=null){
+                    contractFile.setCreateMsg(user);
+                }
                 breakContractFileService.save(contractFile);
                 //文件保存
                 Path path = Paths.get(filePath+File.separator+fileName);
@@ -133,9 +151,21 @@ public class BreakContractFileControl extends BaseController{
         return success("文件保存成功");
     }
 
-    private BreakContractFile getBreakContractFile(String originName){
+    @PostMapping("/getFileMsg")
+    public AjaxResult toGetFileMsg(@RequestBody String fileName){
 
-        BreakContractFile file = new BreakContractFile();
+        JSONObject res = getBreakContractFile(fileName);
+        return success(res);
+    }
+
+    /**
+     * @Description 获取违约项目信息
+     * @author lzp
+     * @Date 2024/1/12
+     */
+    private JSONObject getBreakContractFile(String originName){
+
+        JSONObject body = new JSONObject();
         logger.info("保存文件为-{}",originName);
         //正则表达式获取括号中内容
         String content = getFileNameMsg(originName);
@@ -148,25 +178,25 @@ public class BreakContractFileControl extends BaseController{
                 switch (earn[0]){
                     case "EPC-1":
                     case "EPC-1标":
-                        file.setEpcOne(price);
+                        body.put("EPC-1",price);
                         break;
                     case "EPC-2":
                     case "EPC-2标":
-                        file.setEpcTwo(price);
+                        body.put("EPC-2",price);
                         break;
                     case "J1":
                     case "J1标":
-                        file.setJOne(price);
+                        body.put("J1",price);
                         break;
                     case "J2":
                     case "J2标":
-                        file.setJTwo(price);
+                        body.put("J2",price);
                         break;
 
                 }
             }
         }
-        return file;
+        return body;
     }
 
     private String getFileNameMsg(String name){
