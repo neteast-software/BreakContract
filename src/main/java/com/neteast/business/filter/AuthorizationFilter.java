@@ -2,6 +2,8 @@ package com.neteast.business.filter;
 
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.UnicodeUtil;
+import cn.hutool.crypto.digest.MD5;
 import com.alibaba.fastjson2.JSON;
 import com.neteast.business.domain.LoginUser;
 import com.neteast.business.domain.common.BaseResult;
@@ -12,11 +14,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
+import org.yaml.snakeyaml.reader.UnicodeReader;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 
@@ -77,7 +82,9 @@ public class AuthorizationFilter implements Filter{
         }
 
         LoginUser loginUser = validRequest(request);
-        log.info("用户信息-{}",loginUser);
+        if (loginUser!=null){
+            log.info("校验成功-{}",loginUser);
+        }
         request.setAttribute("userMsg",JSON.toJSONString(loginUser));
 
         if (true){
@@ -100,15 +107,17 @@ public class AuthorizationFilter implements Filter{
         LoginUser loginUser = new LoginUser();
         String tel = request.getHeader(TEL);
         String name = request.getHeader(NAME);
-        String sign = request.getHeader(SIGN);
+        //中文编码转化
+        name = UnicodeUtil.toString(name);
         String t = request.getHeader(T);
         loginUser.setTel(tel);
         loginUser.setUsername(name);
         if (t==null){
             return null;
         }
-        long time = Long.parseLong(t)*1000;
-        Date start = DateUtil.date(time);
+        long time = Long.parseLong(t);
+        loginUser.setTimestamp(time);
+        Date start = DateUtil.date(time*1000);
         loginUser.setValidTime(start);
         //用户信息校验
         if (!loginUser.valid()){
@@ -117,6 +126,13 @@ public class AuthorizationFilter implements Filter{
         Date end = DateUtil.offsetMinute(start,outTime);
         Date now = new Date();
         if (DateUtil.compare(end,now)<0){
+            return null;
+        }
+        log.info("用户信息-{}",loginUser);
+        //验签
+        String sign = request.getHeader(SIGN);
+        boolean res = validMD5(sign, loginUser.gainMD5());
+        if (!res){
             return null;
         }
         return loginUser;
@@ -142,5 +158,16 @@ public class AuthorizationFilter implements Filter{
             e.printStackTrace();
         }
         return null;
+    }
+
+    private boolean validMD5(String sign,String msg){
+        MD5 md5 = MD5.create();
+        String res = md5.digestHex(msg, StandardCharsets.UTF_8);
+        res = res.toUpperCase();
+        log.info("用户信息MD5加密结果-{}-比较{}",res,sign);
+        if (res.equals(sign)){
+            return true;
+        }
+        return false;
     }
 }
