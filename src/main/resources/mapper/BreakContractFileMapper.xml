@@ -10,7 +10,7 @@
         create_phone,update_phone,measure
         from break_contract_file
         <where>
-            <if test="id != null and id != ''">
+            <if test="id != null">
                 and id = #{id}
             </if>
             <if test="documentNumber != null and documentNumber != ''">

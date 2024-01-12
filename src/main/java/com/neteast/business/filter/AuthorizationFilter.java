@@ -3,6 +3,8 @@ package com.neteast.business.filter;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.UnicodeUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.alibaba.fastjson2.JSON;
 import com.neteast.business.domain.LoginUser;
@@ -105,7 +107,7 @@ public class AuthorizationFilter implements Filter{
         String t = request.getHeader(T);
         loginUser.setTel(tel);
         loginUser.setUsername(name);
-        if (t==null){
+        if (StrUtil.isBlank(t) || !NumberUtil.isNumber(t)){
             return null;
         }
         long time = Long.parseLong(t);
