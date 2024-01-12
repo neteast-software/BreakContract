@@ -77,12 +77,10 @@ public class AuthorizationFilter implements Filter{
         }
 
         LoginUser loginUser = validRequest(request);
+
         if (loginUser!=null){
             log.info("校验成功-{}",loginUser);
-        }
-        request.setAttribute("userMsg",JSON.toJSONString(loginUser));
-
-        if (true){
+            request.setAttribute("userMsg",JSON.toJSONString(loginUser));
             //通过生效
             filterChain.doFilter(request, response);
         }else {
