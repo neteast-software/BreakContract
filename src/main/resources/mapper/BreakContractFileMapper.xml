@@ -10,8 +10,11 @@
         create_phone,update_phone,measure
         from break_contract_file
         <where>
-            <if test="id != null and id != ''">
+            <if test="id != null">
                 and id = #{id}
+            </if>
+            <if test="contractType != null">
+                and contract_type = #{contractType}
             </if>
             <if test="documentNumber != null and documentNumber != ''">
                 and document_number = #{documentNumber}
@@ -22,6 +25,7 @@
             <if test="unit != null and unit != ''">
                 and unit = #{unit}
             </if>
+
         </where>
         order by create_time desc
     </select>
