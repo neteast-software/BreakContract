@@ -13,6 +13,9 @@
             <if test="id != null">
                 and id = #{id}
             </if>
+            <if test="contractType != null">
+                and contract_type = #{contractType}
+            </if>
             <if test="documentNumber != null and documentNumber != ''">
                 and document_number = #{documentNumber}
             </if>
@@ -22,6 +25,7 @@
             <if test="unit != null and unit != ''">
                 and unit = #{unit}
             </if>
+
         </where>
         order by create_time desc
     </select>
