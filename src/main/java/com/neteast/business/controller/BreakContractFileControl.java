@@ -10,12 +10,19 @@ import com.neteast.business.domain.vo.BreakContractFileVO;
 import com.neteast.business.service.IBreakContractFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -119,10 +126,11 @@ public class BreakContractFileControl extends BaseController{
             String originName = file.getOriginalFilename();
             if (originName!=null){
                 String title = originName.replaceFirst("\\.\\w+$", "");
-                String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+                String fileName = StringUtils.cleanPath(originName);
                 //保存文件信息
                 BreakContractFile contractFile = new BreakContractFile();
-                contractFile.setFileAddress(filePath+File.separator+fileName);
+                String fileAddress = getFileAddress(fileName,title);
+                contractFile.setFileAddress(fileAddress);
                 contractFile.setContractType(contractType);
                 contractFile.setTitle(title);
                 contractFile.setMeasure(measure);
@@ -138,10 +146,10 @@ public class BreakContractFileControl extends BaseController{
                 if (user!=null){
                     contractFile.setCreateMsg(user);
                 }
-                breakContractFileService.save(contractFile);
                 //文件保存
-                Path path = Paths.get(filePath+File.separator+fileName);
+                Path path = Paths.get(fileAddress);
                 Files.copy(file.getInputStream(),path);
+                breakContractFileService.save(contractFile);
             }else {
                 return error("无法获取文件名称");
             }
@@ -154,8 +162,49 @@ public class BreakContractFileControl extends BaseController{
     @PostMapping("/getFileMsg")
     public AjaxResult toGetFileMsg(@RequestBody String fileName){
 
-        JSONObject res = getBreakContractFile(fileName);
+        String title = fileName.replaceFirst("\\.\\w+$", "");
+        JSONObject res = getBreakContractFile(title);
         return success(res);
+    }
+
+    @GetMapping("/getFile/{id}")
+    public ResponseEntity<Resource> getFile(@PathVariable("id")Integer id){
+
+        //获取文件信息
+        BreakContractFile file = breakContractFileService.getById(id);
+        if (file==null){
+            AjaxResult ajaxResult = error("文件找不到");
+            return ResponseEntity.status(404)
+                    .body(null);
+        }
+        String path = file.getFileAddress();
+        String fileType = path.substring(path.lastIndexOf(".")+1);
+        String fileName = file.getTitle()+"."+fileType;
+        Resource resource = new FileSystemResource(path);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("application/octet-stream"));
+        headers.setContentDispositionFormData("attachment", new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        logger.info("下载文件名称-{}",fileName);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
+    }
+
+
+
+    /**
+     * @Description 获取文件地址
+     * @author lzp
+     * @Date 2024/1/12
+     */
+    private String getFileAddress(String fileName,String title){
+        //获取文件类型
+        String type = fileName.substring(fileName.lastIndexOf('.')+1);
+        long count = this.breakContractFileService.lambdaQuery().like(BreakContractFile::getTitle,title).count();
+        if (count==0){
+            return filePath+File.separator+fileName;
+        }
+        return filePath+File.separator+title+"-"+count+"."+type;
     }
 
     /**
