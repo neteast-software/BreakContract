@@ -80,14 +80,12 @@ public class BreakContractFileControl extends BaseController{
     }
 
     @PostMapping("/update")
-    public AjaxResult updateBreakContractFile(@RequestBody BreakContractFile file,@RequestAttribute(value = "userMsg",required = false)String userMsg){
+    public AjaxResult updateBreakContractFile(@RequestBody BreakContractFile file,@RequestAttribute(value = "userMsg")String userMsg){
 
         logger.info("用户信息-{}",userMsg);
         LoginUser user = JSON.parseObject(userMsg,LoginUser.class);
         file.setUpdateTime(new Date());
-        if (user!=null){
-            file.setUpdateMsg(user);
-        }
+        file.setUpdateMsg(user);
         breakContractFileService.updateById(file);
         return success();
     }
@@ -104,7 +102,7 @@ public class BreakContractFileControl extends BaseController{
                                               @RequestParam(value = "jone",required = false)Double JOne,
                                               @RequestParam(value = "jtwo",required = false)Double JTwo,
                                               @RequestParam(value = "reward",required = false)Double reward,
-                                              @RequestAttribute(value = "userMsg",required = false)String userMsg) throws IOException {
+                                              @RequestAttribute(value = "userMsg")String userMsg) throws IOException {
 
         if (file==null){
             logger.info("文件未上传-{}",documentNumber);
@@ -128,9 +126,12 @@ public class BreakContractFileControl extends BaseController{
             if (originName!=null){
                 String title = originName.replaceFirst("\\.\\w+$", "");
                 String fileName = StringUtils.cleanPath(originName);
+                String fileAddress = getFileAddress(fileName,title);
+                //文件保存
+                Path path = Paths.get(fileAddress);
+                Files.copy(file.getInputStream(),path);
                 //保存文件信息
                 BreakContractFile contractFile = new BreakContractFile();
-                String fileAddress = getFileAddress(fileName,title);
                 contractFile.setFileAddress(fileAddress);
                 contractFile.setContractType(contractType);
                 contractFile.setTitle(title);
@@ -144,12 +145,7 @@ public class BreakContractFileControl extends BaseController{
                 contractFile.setEpcOne(EPCOne);
                 contractFile.setReward(reward);
                 contractFile.setCreateTime(new Date());
-                if (user!=null){
-                    contractFile.setCreateMsg(user);
-                }
-                //文件保存
-                Path path = Paths.get(fileAddress);
-                Files.copy(file.getInputStream(),path);
+                contractFile.setCreateMsg(user);
                 breakContractFileService.save(contractFile);
             }else {
                 return error("无法获取文件名称");
@@ -189,8 +185,6 @@ public class BreakContractFileControl extends BaseController{
                 .headers(headers)
                 .body(resource);
     }
-
-
 
     /**
      * @Description 获取文件地址
