@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -174,7 +174,6 @@ public class BreakContractFileControl extends BaseController{
         //获取文件信息
         BreakContractFile file = breakContractFileService.getById(id);
         if (file==null){
-            AjaxResult ajaxResult = error("文件找不到");
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(null);
         }
@@ -201,11 +200,8 @@ public class BreakContractFileControl extends BaseController{
     private String getFileAddress(String fileName,String title){
         //获取文件类型
         String type = fileName.substring(fileName.lastIndexOf('.')+1);
-        long count = this.breakContractFileService.lambdaQuery().like(BreakContractFile::getTitle,title).count();
-        if (count==0){
-            return filePath+File.separator+fileName;
-        }
-        return filePath+File.separator+title+"-"+count+"."+type;
+        String uuid = UUID.randomUUID().toString().replace("-","");
+        return filePath+File.separator+title+"-"+uuid+"."+type;
     }
 
     /**
