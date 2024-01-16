@@ -24,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author lzp
@@ -63,7 +65,7 @@ public class UploadFileControl extends BaseController{
                 String fileName = StringUtils.cleanPath(originName);
                 String fileAddress = getFileAddress(fileName,realFilePath);
                 if (fileAddress==null){
-                    return error("文件已存在");
+                    return error("该文件已经存在");
                 }
                 //文件信息保存
                 uploadFile.setFileName(fileName);
@@ -126,12 +128,21 @@ public class UploadFileControl extends BaseController{
      */
     private String getFileAddress(String fileName,String realFilePath){
 
-        String fileAddress = realFilePath+File.separator+fileName;
-        Long count = uploadFileService.lambdaQuery().eq(UploadFile::getFileAddress,fileAddress).count();
-        if (count==0){
-            return fileAddress;
+        //String title = fileName.replaceFirst("\\.\\w+$", "");
+        //String type = fileName.substring(fileName.lastIndexOf('.')+1);
+        //long timeStamp = new Date().getTime();
+        List<UploadFile> uploadFiles = this.uploadFileService.lambdaQuery().eq(UploadFile::getFileName,fileName).list();
+        if (uploadFiles.size()!=0){
+            for (UploadFile file:uploadFiles) {
+                if (file.getProjectId()!=null){
+                    return null;
+                }else {
+                    //进行文件删除
+                    uploadFileService.removeFile(file.getId());
+                }
+            }
         }
-        return null;
+        return realFilePath+File.separator+fileName;
     }
     
 }

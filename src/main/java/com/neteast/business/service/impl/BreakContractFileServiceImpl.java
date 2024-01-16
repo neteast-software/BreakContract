@@ -49,9 +49,9 @@ public class BreakContractFileServiceImpl extends ServiceImpl<BreakContractFileM
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean addBreakContact(BreakContractFile file,List<Integer> ids) {
-        Integer projectId = fileMapper.insert(file);
-        uploadFileService.updateFileByProjectId(ids,projectId);
+    public Boolean addBreakContract(BreakContractFile file, List<Integer> ids) {
+        fileMapper.insert(file);
+        uploadFileService.updateFileByProjectId(ids,file.getId());
         return true;
     }
 
@@ -62,6 +62,14 @@ public class BreakContractFileServiceImpl extends ServiceImpl<BreakContractFileM
         uploadFileService.removeFileByProjectId(id);
         //文件信息删除
         removeById(id);
+        return true;
+    }
+
+    @Override
+    public boolean updateBreakContract(BreakContractFile file, List<Integer> ids) {
+
+        uploadFileService.updateFileByProjectId(ids,file.getId());
+        this.updateById(file);
         return true;
     }
 }

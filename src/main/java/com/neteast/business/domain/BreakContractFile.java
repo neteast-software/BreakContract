@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 
 @Data
-@TableName("break_contract")
+@TableName("break_contract_file")
 public class BreakContractFile extends BaseEntity {
 
     /** 主键id */

@@ -4,12 +4,12 @@ import com.alibaba.fastjson2.JSON;
 import com.github.pagehelper.PageInfo;
 import com.neteast.business.domain.BreakContractFile;
 import com.neteast.business.domain.LoginUser;
-import com.neteast.business.domain.UploadFile;
 import com.neteast.business.domain.common.AjaxResult;
 import com.neteast.business.domain.vo.BreakContractFileVO;
 import com.neteast.business.domain.vo.UploadFileVO;
 import com.neteast.business.service.IBreakContractFileService;
 import com.neteast.business.service.IUploadFileService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -24,6 +24,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/breakContract")
 public class BreakContractFileControl extends BaseController{
+
+    @Value("${contract.file.path}")
+    public String filePath;
 
     @Resource
     private IBreakContractFileService breakContractFileService;
@@ -40,6 +43,8 @@ public class BreakContractFileControl extends BaseController{
         Long count = new PageInfo(fileList).getTotal();
         fileList.forEach(file -> {
             BreakContractFileVO vo = BreakContractFileVO.convert(file);
+            List<UploadFileVO> fileVOS = uploadFileService.getUploadFileVOListByProjectId(file.getId());
+            vo.setFileIds(fileVOS);
             voList.add(vo);
         });
         AjaxResult result = success();
@@ -62,7 +67,9 @@ public class BreakContractFileControl extends BaseController{
         LoginUser user = JSON.parseObject(userMsg,LoginUser.class);
         BreakContractFile file = BreakContractFileVO.convert(vo);
         file.setUpdateMsg(user);
-        breakContractFileService.save(file);
+        List<UploadFileVO> uploadFiles = vo.getFileIds();
+        List<Integer> ids = uploadFiles.stream().map(UploadFileVO::getId).toList();
+        breakContractFileService.updateBreakContract(file,ids);
         return success();
     }
 
@@ -78,10 +85,11 @@ public class BreakContractFileControl extends BaseController{
             return error("文号重复");
         }
         file.setCreateMsg(user);
-        Boolean res = breakContractFileService.addBreakContact(file,ids);
+        Boolean res = breakContractFileService.addBreakContract(file,ids);
         if (!res){
-            return error("添加成功");
+            return error("添加失败");
         }
-        return success("添加失败");
+        return success("添加成功");
     }
+
 }

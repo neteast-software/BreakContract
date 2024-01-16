@@ -3,11 +3,13 @@ package com.neteast.business.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.neteast.business.domain.UploadFile;
+import com.neteast.business.domain.vo.UploadFileVO;
 import com.neteast.business.mapper.UploadFileMapper;
 import com.neteast.business.service.IUploadFileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +24,14 @@ import java.util.List;
 @Service
 @Slf4j
 public class UploadFileServiceImpl extends ServiceImpl<UploadFileMapper, UploadFile> implements IUploadFileService {
+
+    @Resource
+    UploadFileMapper uploadFileMapper;
+
+    @Override
+    public List<UploadFileVO> getUploadFileVOListByProjectId(Integer projectId) {
+        return uploadFileMapper.getListByProjectId(projectId);
+    }
 
     @Override
     public boolean removeFile(Integer id) {

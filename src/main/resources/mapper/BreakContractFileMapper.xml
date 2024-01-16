@@ -25,7 +25,6 @@
             <if test="unit != null and unit != ''">
                 and unit = #{unit}
             </if>
-
         </where>
         order by create_time desc
     </select>
