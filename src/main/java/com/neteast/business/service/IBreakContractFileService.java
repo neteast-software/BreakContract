@@ -2,6 +2,7 @@ package com.neteast.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.neteast.business.domain.BreakContractFile;
+import com.neteast.business.domain.vo.BreakContractFileVO;
 
 import java.util.List;
 
@@ -11,7 +12,9 @@ import java.util.List;
  */
 public interface IBreakContractFileService extends IService<BreakContractFile> {
 
-    public List<BreakContractFile> getBreakContractFileList(BreakContractFile file);
+    List<BreakContractFile> getBreakContractFileList(BreakContractFile file);
 
-    public Boolean removeBreakContract(Integer id);
+    Boolean removeBreakContract(Integer id);
+
+    Boolean addBreakContact(BreakContractFile file,List<Integer> id);
 }

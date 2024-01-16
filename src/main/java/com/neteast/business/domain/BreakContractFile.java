@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 
 @Data
-@TableName("break_contract_file")
+@TableName("break_contract")
 public class BreakContractFile extends BaseEntity {
 
     /** 主键id */
@@ -32,10 +32,6 @@ public class BreakContractFile extends BaseEntity {
     /** 项目类型 */
     @TableField("contract_type")
     private Integer contractType;
-
-    /** 文件地址 */
-    @TableField("file_address")
-    private String fileAddress;
 
     /** 文号 */
     @TableField("document_number")

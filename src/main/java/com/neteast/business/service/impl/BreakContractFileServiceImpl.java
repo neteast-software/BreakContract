@@ -1,13 +1,19 @@
 package com.neteast.business.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.neteast.business.domain.BreakContractFile;
+import com.neteast.business.domain.LoginUser;
+import com.neteast.business.domain.vo.BreakContractFileVO;
 import com.neteast.business.mapper.BreakContractFileMapper;
 import com.neteast.business.service.IBreakContractFileService;
+import com.neteast.business.service.IUploadFileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,7 +30,12 @@ import java.util.List;
 @Slf4j
 public class BreakContractFileServiceImpl extends ServiceImpl<BreakContractFileMapper, BreakContractFile> implements IBreakContractFileService{
 
+    @Resource
     private BreakContractFileMapper fileMapper;
+
+    @Resource
+    private IUploadFileService uploadFileService;
+
 
     @Autowired
     public void setBreakContractFileMapper(BreakContractFileMapper mapper){
@@ -37,19 +48,18 @@ public class BreakContractFileServiceImpl extends ServiceImpl<BreakContractFileM
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean addBreakContact(BreakContractFile file,List<Integer> ids) {
+        Integer projectId = fileMapper.insert(file);
+        uploadFileService.updateFileByProjectId(ids,projectId);
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean removeBreakContract(Integer id) {
 
-        BreakContractFile file = getById(id);
-        if (file==null){
-            return false;
-        }
-        //文件删除
-        Path path = Paths.get(file.getFileAddress());
-        try {
-            Files.deleteIfExists(path);
-        }catch (IOException e){
-            log.info("文件不存在-{}",path);
-        }
+        uploadFileService.removeFileByProjectId(id);
         //文件信息删除
         removeById(id);
         return true;

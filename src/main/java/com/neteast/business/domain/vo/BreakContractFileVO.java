@@ -7,6 +7,7 @@ import com.neteast.business.domain.enums.ContractType;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lzp
@@ -55,11 +56,19 @@ public class BreakContractFileVO {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date handleTime;
 
+    private List<UploadFileVO> fileIds;
+
     public static BreakContractFileVO convert(BreakContractFile file){
         BreakContractFileVO vo = new BreakContractFileVO();
         BeanUtil.copyProperties(file,vo);
         //设置类型
         vo.setContractName(ContractType.getType(file.getContractType()));
         return vo;
+    }
+
+    public static BreakContractFile convert(BreakContractFileVO vo){
+        BreakContractFile file = new BreakContractFile();
+        BeanUtil.copyProperties(vo,file);
+        return file;
     }
 }
