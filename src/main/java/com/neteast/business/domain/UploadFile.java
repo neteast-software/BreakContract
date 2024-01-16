@@ -32,4 +32,8 @@ public class UploadFile extends BaseEntity {
     /** 文件地址 */
     @TableField("file_address")
     private String fileAddress;
+
+    /** 交易类型 */
+    @TableField("contract_type")
+    private Integer contractType;
 }

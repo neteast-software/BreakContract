@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -63,7 +61,7 @@ public class UploadFileControl extends BaseController{
             if (originName!=null){
                 UploadFile uploadFile = new UploadFile();
                 String fileName = StringUtils.cleanPath(originName);
-                String fileAddress = getFileAddress(fileName,realFilePath);
+                String fileAddress = getFileAddress(fileName,realFilePath,contractType);
                 if (fileAddress==null){
                     return error("该文件已经存在");
                 }
@@ -71,6 +69,7 @@ public class UploadFileControl extends BaseController{
                 uploadFile.setFileName(fileName);
                 uploadFile.setFileAddress(fileAddress);
                 uploadFile.setCreateMsg(user);
+                uploadFile.setContractType(contractType);
                 uploadFileService.save(uploadFile);
                 //文件保存
                 Path path = Paths.get(fileAddress);
@@ -126,12 +125,13 @@ public class UploadFileControl extends BaseController{
      * @author lzp
      * @Date 2024/1/12
      */
-    private String getFileAddress(String fileName,String realFilePath){
+    private synchronized String getFileAddress(String fileName,String realFilePath,Integer contractType){
 
         //String title = fileName.replaceFirst("\\.\\w+$", "");
         //String type = fileName.substring(fileName.lastIndexOf('.')+1);
         //long timeStamp = new Date().getTime();
-        List<UploadFile> uploadFiles = this.uploadFileService.lambdaQuery().eq(UploadFile::getFileName,fileName).list();
+        List<UploadFile> uploadFiles = this.uploadFileService.lambdaQuery().eq(UploadFile::getFileName,fileName)
+                .eq(UploadFile::getContractType,contractType).list();
         if (uploadFiles.size()!=0){
             for (UploadFile file:uploadFiles) {
                 if (file.getProjectId()!=null){
