@@ -96,7 +96,7 @@ public class BreakContractFileControl extends BaseController{
                                               @RequestParam("documentNumber")String documentNumber,
                                               @RequestParam("unit")String unit,
                                               @RequestParam("handleTime")Date handleTime,
-                                              @RequestParam("measure")String measure,
+                                              @RequestParam(value = "measure",required = false)String measure,
                                               @RequestParam(value = "epcOne",required = false)Double EPCOne,
                                               @RequestParam(value = "epcTwo",required = false)Double EPCTwo,
                                               @RequestParam(value = "jone",required = false)Double JOne,
