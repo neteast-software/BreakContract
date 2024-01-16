@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.neteast.business.domain.BreakContractFile;
 import com.neteast.business.domain.LoginUser;
 import com.neteast.business.domain.common.AjaxResult;
+import com.neteast.business.domain.enums.ContractType;
 import com.neteast.business.domain.vo.BreakContractFileVO;
 import com.neteast.business.service.IBreakContractFileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -111,8 +113,10 @@ public class BreakContractFileControl extends BaseController{
         logger.info("用户信息-{}",userMsg);
         LoginUser user = JSON.parseObject(userMsg,LoginUser.class);
         //无目录进行创建
+        String dirType = ContractType.getType(contractType);
+        String realFilePath = filePath+File.separator+dirType;
         boolean res = true;
-        File dir = new File(filePath);
+        File dir = new File(realFilePath);
         if (!dir.exists()){
             res = dir.mkdir();
         }
@@ -126,7 +130,10 @@ public class BreakContractFileControl extends BaseController{
             if (originName!=null){
                 String title = originName.replaceFirst("\\.\\w+$", "");
                 String fileName = StringUtils.cleanPath(originName);
-                String fileAddress = getFileAddress(fileName,title);
+                String fileAddress = getFileAddress(fileName,realFilePath);
+                if (fileAddress==null){
+                    return error("文件已存在");
+                }
                 //文件保存
                 Path path = Paths.get(fileAddress);
                 Files.copy(file.getInputStream(),path);
@@ -151,7 +158,7 @@ public class BreakContractFileControl extends BaseController{
                 return error("无法获取文件名称");
             }
         }else {
-            return error("无法创建文件目录，请手动创建目录:"+filePath);
+            return error("无法创建文件目录，请手动创建目录:"+realFilePath);
         }
         return success("文件保存成功");
     }
@@ -191,11 +198,14 @@ public class BreakContractFileControl extends BaseController{
      * @author lzp
      * @Date 2024/1/12
      */
-    private String getFileAddress(String fileName,String title){
-        //获取文件类型
-        String type = fileName.substring(fileName.lastIndexOf('.')+1);
-        String uuid = UUID.randomUUID().toString().replace("-","");
-        return filePath+File.separator+title+"-"+uuid+"."+type;
+    private String getFileAddress(String fileName,String realFilePath){
+
+        String fileAddress = realFilePath+File.separator+fileName;
+        Long count = breakContractFileService.lambdaQuery().eq(BreakContractFile::getFileAddress,fileAddress).count();
+        if (count==0){
+            return fileAddress;
+        }
+        return null;
     }
 
     /**
