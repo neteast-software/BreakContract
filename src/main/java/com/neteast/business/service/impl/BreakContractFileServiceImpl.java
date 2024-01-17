@@ -3,8 +3,6 @@ package com.neteast.business.service.impl;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.neteast.business.domain.BreakContractFile;
-import com.neteast.business.domain.LoginUser;
-import com.neteast.business.domain.vo.BreakContractFileVO;
 import com.neteast.business.mapper.BreakContractFileMapper;
 import com.neteast.business.service.IBreakContractFileService;
 import com.neteast.business.service.IUploadFileService;
@@ -14,11 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
