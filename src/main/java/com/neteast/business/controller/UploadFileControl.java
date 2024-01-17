@@ -43,6 +43,7 @@ public class UploadFileControl extends BaseController{
     @PostMapping("/upload")
     public AjaxResult uploadFile(@RequestParam(value = "file",required = false) MultipartFile file,
                                  @RequestParam("contractType")Integer contractType,
+                                 @RequestParam("fileSize")Double fileSize,
                                  @RequestAttribute(value = "userMsg")String userMsg) throws IOException {
         if (file==null){
             return error("上传文件为空");
@@ -70,6 +71,7 @@ public class UploadFileControl extends BaseController{
                 uploadFile.setFileAddress(fileAddress);
                 uploadFile.setCreateMsg(user);
                 uploadFile.setContractType(contractType);
+                uploadFile.setFileSize(fileSize);
                 uploadFileService.save(uploadFile);
                 //文件保存
                 Path path = Paths.get(fileAddress);

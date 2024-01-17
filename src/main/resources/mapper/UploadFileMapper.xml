@@ -5,7 +5,7 @@
 <mapper namespace="com.neteast.business.mapper.UploadFileMapper">
 
     <select id="getListByProjectId" resultType="com.neteast.business.domain.vo.UploadFileVO" >
-        select id,file_name from upload_file where project_id = #{projectId}
+        select id,file_name,file_size from upload_file where project_id = #{projectId}
     </select>
 
 </mapper>

@@ -14,6 +14,8 @@ public class UploadFileVO {
 
     private Integer id;
 
+    private Double fileSize;
+
     private String fileName;
 
     public static UploadFileVO convert(UploadFile uploadFile){
