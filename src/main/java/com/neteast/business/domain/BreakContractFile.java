@@ -45,41 +45,21 @@ public class BreakContractFile extends BaseEntity {
     @TableField("reward")
     private Double reward = 0.0D;
 
-    public void setReward(Double reward) {
-        this.reward = Objects.requireNonNullElse(reward, 0.0);
-    }
-
     /** EPC-1 */
     @TableField("epc_one")
     private Double EpcOne = 0.0D;
-
-    public void setEpcOne(Double epcOne) {
-        this.EpcOne = Objects.requireNonNullElse(epcOne,0.0);
-    }
 
     /** EPC-2 */
     @TableField("epc_two")
     private Double EpcTwo = 0.0D;
 
-    public void setEpcTwo(Double epcTwo) {
-        this.EpcTwo = Objects.requireNonNullElse(epcTwo,0.0);
-    }
-
     /** J1 */
     @TableField("j_one")
     private Double JOne = 0.0D;
 
-    public void setJOne(Double JOne) {
-        this.JOne = Objects.requireNonNullElse(JOne,0.0);
-    }
-
     /** J2 */
     @TableField("j_two")
     private Double JTwo = 0.0D;
-
-    public void setJTwo(Double JTwo) {
-        this.JTwo = Objects.requireNonNullElse(JTwo,0.0);
-    }
 
     /** 单位 */
     @TableField("unit")

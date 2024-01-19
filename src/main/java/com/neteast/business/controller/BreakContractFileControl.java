@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author lzp
@@ -68,7 +69,7 @@ public class BreakContractFileControl extends BaseController{
         BreakContractFile file = BreakContractFileVO.convert(vo);
         file.setUpdateMsg(user);
         List<UploadFileVO> uploadFiles = vo.getFileIds();
-        List<Integer> ids = uploadFiles.stream().map(UploadFileVO::getId).toList();
+        List<Integer> ids = uploadFiles.stream().map(UploadFileVO::getId).collect(Collectors.toList());
         breakContractFileService.updateBreakContract(file,ids);
         return success();
     }
@@ -78,7 +79,7 @@ public class BreakContractFileControl extends BaseController{
 
         LoginUser user = JSON.parseObject(userMsg,LoginUser.class);
         List<UploadFileVO> uploadFiles = vo.getFileIds();
-        List<Integer> ids = uploadFiles.stream().map(UploadFileVO::getId).toList();
+        List<Integer> ids = uploadFiles.stream().map(UploadFileVO::getId).collect(Collectors.toList());
         BreakContractFile file = BreakContractFileVO.convert(vo);
         Long count = breakContractFileService.lambdaQuery().eq(BreakContractFile::getDocumentNumber,file.getDocumentNumber()).count();
         if (count!=0){

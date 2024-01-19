@@ -1,12 +1,15 @@
 server:
-  port: 9999
+  port: 8015
 
 # 项目信息配置
 contract:
   #操作时间(分钟)
-  time: 100000
+  time: 120
   file:
-    path: C:\Users\linfu\Desktop\testFile
+    path: /usr/local/java/break_contract/upload
+    prefix: /static
+    view-prefix: /view
+    view-path: /usr/local/java/break_contract/view
 
 #数据库配置信息
 spring:
