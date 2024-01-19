@@ -4,9 +4,10 @@ server:
 # 项目信息配置
 contract:
   #操作时间(分钟)
-  time: 120
+  time: 100000
   file:
-    path: /usr/local/java/break_contract/upload
+#    path: /usr/local/java/break_contract/upload
+    path: C:\Users\linfu\Desktop\testFile
     prefix: /static
     view-prefix: /view
     view-path: /usr/local/java/break_contract/view
