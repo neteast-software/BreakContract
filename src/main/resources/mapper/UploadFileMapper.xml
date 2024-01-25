@@ -4,8 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.neteast.business.mapper.UploadFileMapper">
 
-    <select id="getListByProjectId" resultType="com.neteast.business.domain.vo.UploadFileVO" >
-        select id,file_name,file_size from upload_file where project_id = #{projectId}
+    <select id="getListByProjectId" resultType="com.neteast.business.domain.UploadFile" >
+        select id,file_name,file_size,file_address from upload_file where project_id = #{projectId}
     </select>
 
 </mapper>

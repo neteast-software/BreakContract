@@ -15,5 +15,5 @@ import java.util.List;
 @Mapper
 public interface UploadFileMapper extends BaseMapper<UploadFile> {
 
-    List<UploadFileVO> getListByProjectId(Integer projectId);
+    List<UploadFile> getListByProjectId(Integer projectId);
 }

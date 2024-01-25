@@ -29,7 +29,7 @@ public class UploadFileServiceImpl extends ServiceImpl<UploadFileMapper, UploadF
     UploadFileMapper uploadFileMapper;
 
     @Override
-    public List<UploadFileVO> getUploadFileVOListByProjectId(Integer projectId) {
+    public List<UploadFile> getUploadFileVOListByProjectId(Integer projectId) {
         return uploadFileMapper.getListByProjectId(projectId);
     }
 

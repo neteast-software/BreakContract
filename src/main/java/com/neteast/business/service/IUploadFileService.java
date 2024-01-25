@@ -18,5 +18,5 @@ public interface IUploadFileService extends IService<UploadFile> {
 
     boolean removeFileByProjectId(Integer projectId);
 
-    List<UploadFileVO> getUploadFileVOListByProjectId(Integer projectId);
+    List<UploadFile> getUploadFileVOListByProjectId(Integer projectId);
 }

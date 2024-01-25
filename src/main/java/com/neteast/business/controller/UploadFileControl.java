@@ -17,8 +17,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,6 +45,7 @@ public class UploadFileControl extends BaseController{
     public AjaxResult uploadFile(@RequestParam(value = "file",required = false) MultipartFile file,
                                  @RequestParam("contractType")Integer contractType,
                                  @RequestParam("fileSize")Double fileSize,
+                                 @RequestParam(value = "id",required = false) Integer id,
                                  @RequestAttribute(value = "userMsg")String userMsg) throws IOException {
         if (file==null){
             return error("上传文件为空");
@@ -73,11 +74,16 @@ public class UploadFileControl extends BaseController{
                 uploadFile.setCreateMsg(user);
                 uploadFile.setContractType(contractType);
                 uploadFile.setFileSize(fileSize);
+                if (id!=null){
+                    uploadFile.setProjectId(id);
+                }
                 uploadFileService.save(uploadFile);
                 //文件保存
                 Path path = Paths.get(fileAddress);
                 Files.copy(file.getInputStream(),path);
                 UploadFileVO vo = UploadFileVO.convert(uploadFile);
+                String url = getUrl(uploadFile);
+                vo.setUrl(url);
                 return success(vo);
             }else {
                 return error("无法获取文件名称");
@@ -111,6 +117,29 @@ public class UploadFileControl extends BaseController{
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(resource);
+    }
+
+//    @GetMapping("/getFile/{id}")
+    public void downloadFile(@PathVariable("id")Integer id, HttpServletResponse response){
+
+        UploadFile uploadFile = uploadFileService.getById(id);
+        File file = new File(uploadFile.getFileAddress());
+        response.reset();
+        response.setContentType("application/octet-stream");
+        response.setCharacterEncoding("utf-8");
+        response.setContentLength((int) file.length());
+        response.setHeader("Content-Disposition", "attachment;filename=" + uploadFile.getFileName() );
+
+        try(BufferedInputStream bis = new BufferedInputStream(Files.newInputStream(file.toPath()));) {
+            byte[] buff = new byte[1024];
+            OutputStream os  = response.getOutputStream();
+            int i = 0;
+            while ((i = bis.read(buff)) != -1) {
+                os.write(buff, 0, i);
+                os.flush();
+            }
+        } catch (IOException e) {
+        }
     }
 
     @PostMapping("/del/{id}")
@@ -147,5 +176,13 @@ public class UploadFileControl extends BaseController{
 //        }
         return realFilePath+File.separator+title+"-"+timeStamp+"."+type;
     }
-    
+
+    private String getUrl(UploadFile file){
+
+        int begin = file.getFileAddress().lastIndexOf(File.separator);
+        int end = file.getFileAddress().lastIndexOf(File.separator,begin-1);
+        String dir = file.getFileAddress().substring(end+1,begin);
+        String name = file.getFileAddress().substring(begin+1);
+        return "/static/"+dir+"/"+name;
+    }
 }
