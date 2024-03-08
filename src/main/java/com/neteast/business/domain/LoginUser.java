@@ -35,9 +35,9 @@ public class LoginUser {
         return true;
     }
 
-    public String gainMD5(){
-        log.info("加密前字符串为-{}",tel+username+timestamp+"09B4D22E12142406BB85DA671D1F9A1C");
-        return tel+username+timestamp+"09B4D22E12142406BB85DA671D1F9A1C";
+    public String gainMD5(String key){
+        log.info("加密前字符串为-{}",tel+username+timestamp+key);
+        return tel+username+timestamp+key;
     }
 
 }

@@ -43,6 +43,11 @@ public class AuthorizationFilter implements Filter{
 
     private static final String SIGN = "sign";
 
+    /** key值 */
+    @Value("${contract.key}")
+    public String key;
+
+    /** 超时时间 */
     @Value("${contract.time}")
     public Integer outTime;
 
@@ -107,6 +112,7 @@ public class AuthorizationFilter implements Filter{
         String t = request.getHeader(T);
         loginUser.setTel(tel);
         loginUser.setUsername(name);
+        //检验时间戳数据正规性，以防后面检验错误
         if (StrUtil.isBlank(t) || !NumberUtil.isNumber(t)){
             return null;
         }
@@ -126,7 +132,7 @@ public class AuthorizationFilter implements Filter{
         log.info("用户信息-{}",loginUser);
         //验签
         String sign = request.getHeader(SIGN);
-        boolean res = validMD5(sign, loginUser.gainMD5());
+        boolean res = validMD5(sign, loginUser.gainMD5(key));
         if (!res){
             return null;
         }

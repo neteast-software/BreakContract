@@ -3,6 +3,8 @@ server:
 
 # 项目信息配置
 contract:
+  #密钥
+  key: 09B4D22E12142406BB85DA671D1F9A1C
   #操作时间(分钟)
   time: 100000
   file:
@@ -11,7 +13,6 @@ contract:
     prefix: /static
     view-prefix: /view
     view-path: /usr/local/java/break_contract/view
-
 #数据库配置信息
 spring:
   datasource:
